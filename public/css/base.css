@@ -170,6 +170,8 @@ body {
 .block ul li .info {
     float: right;
     font: bold 1em monospace;
+    width: 100px;
+    text-align: right;
 }
 
 .block ul li span.buttons {
