@@ -62,6 +62,10 @@ class List
     false
   end
 
+  def List.empty?(place, name)
+    !File.exists("views/archives/#{place}.#{$domain}/#{name}/index.html")
+  end
+
   def initialize(name, host)
     @name = name
     @host = host
@@ -169,7 +173,7 @@ end
 post '/:place/subscribe/?' do
   name = params[:place]
   @email = params[:email]
-  @subscribe = params[:subscribe] == "Inscription" ? true : false
+  @subscribe = params[:subscribe] == I18n.t("sub") ? true : false
   @place = Place.new(params[:place])
 
   lists = []
