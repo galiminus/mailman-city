@@ -21,7 +21,7 @@ xml.div(:class => 'block') {
                   :href => "mailto:#{list.name}@#{list.host}")
             xml.a(I18n.t("archives"),
                   :class => 'button',
-                  :href => "/#{@place.name}/#{list.name}/") if !List.empty?(@place.name, @list.name)
+                  :href => "/#{@place.name}/#{list.name}/") if !List.empty?(@place.name, list.name)
           }
         }
       end

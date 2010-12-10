@@ -63,7 +63,7 @@ class List
   end
 
   def List.empty?(place, name)
-    !File.exists("views/archives/#{place}.#{$domain}/#{name}/index.html")
+    !File.exists?("views/archives/#{place}.#{$domain}/#{name}/pipermail.pck")
   end
 
   def initialize(name, host)
