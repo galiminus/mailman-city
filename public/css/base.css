@@ -73,6 +73,15 @@ body {
     color: white;
 }
 
+#nav ul li.left.sep {
+    width: 20px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 40px;
+    font-weight: bold;
+    color: #777777;
+}
+
 #nav ul li.right {
     display: block;
     float: right;
