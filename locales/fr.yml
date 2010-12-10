@@ -1,0 +1,13 @@
+fr:
+  confirm: 'Veuillez cliquer sur le lien suivant pour confirmer'
+  lists: 'Liste(s) concernee(s)'
+  confirm_sub: 'Confirmation inscription'
+  confirm_unsub: 'Confirmation desinscription'
+  contact: 'Contact'
+  places: 'Villes'
+  confirm_email: '"Un email de confirmation vous a ete envoye a : '
+  email_addr: 'Adresse email : '
+  sub: 'Inscription'
+  unsub: 'Desinscription'
+  post: "Poster"
+  archives: "Archives"

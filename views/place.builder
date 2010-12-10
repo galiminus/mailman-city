@@ -16,10 +16,10 @@ xml.div(:class => 'block') {
           name = nb <= 1 ? "membre" : "membres"
           xml.span("#{nb} #{name}", :class => 'info')
           xml.span(:class => 'buttons') {
-            xml.a("Poster",
+            xml.a(I18n.t("post"),
                   :class => 'button',
                   :href => "mailto:#{list.name}@#{list.host}")
-            xml.a("Archives",
+            xml.a(I18n.t("archives"),
                   :class => 'button',
                   :href => "/#{@place.name}/#{list.name}/")
           }

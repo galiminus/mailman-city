@@ -38,7 +38,7 @@ xml.html(:xmlns => "http://www.w3.org/1999/xhtml") {
         } if @date
 
         xml.li(:class => 'right') {
-          xml.a "Contact",
+          xml.a I18n.t("contact"),
           :href => 'mailto:#{$contact}',
           :class => 'off'
         }

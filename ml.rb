@@ -8,6 +8,7 @@ require 'yaml'
 require 'uri'
 require 'escape'
 require 'pathname'
+require 'i18n'
 
 config = YAML.load_file("config.yaml")
 config.each do |key, value|
@@ -15,6 +16,10 @@ config.each do |key, value|
 end
 
 $aes = Crypt::Rijndael.new($aes_key)
+
+path=File.dirname(__FILE__)
+I18n.load_path += Dir[ File.join(path, 'locales', '*.{rb,yml}') ]
+I18n.default_locale = $locale
 
 class MLServer
   def places
@@ -119,16 +124,16 @@ def send_confirm(place, lists, email, subscribe)
 
   confirm_link = "http://#{$domain}/confirm/#{confirm_code}"
 
-  body = "Liste(s) concernee(s) :\n"
+  body = "#{I18n.t "lists"} :\n"
   lists.each do |list|
     body += "\t#{list}@#{place.name}.#{$domain}\n"
   end
-  body += "\n\nVeuillez cliquer sur le lien suivant pour confirmer : #{confirm_link}"
+  body += "\n\n#{I18n.t "confirm"} : #{confirm_link}"
   body += "\n-- \n#{$domain}"
 
   Pony.mail(:to => email,
             :from => "#{$from}@#{$domain}",
-            :subject => @subscribe ? 'Confirmation inscription' : 'Confirmation desinscription',
+            :subject => @subscribe ? I18n.t("confirm_unsub") : I18n.t("confirm_unsub"),
             :body => body)
 end
 

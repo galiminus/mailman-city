@@ -1,5 +1,5 @@
 xml.div(:class => 'block') {
-  xml.h2 "Villes"
+  xml.h2 I18n.t("places")
   xml.ul {
     @places.each do |place|
       xml.li {
