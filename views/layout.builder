@@ -39,7 +39,7 @@ xml.html(:xmlns => "http://www.w3.org/1999/xhtml") {
 
         xml.li(:class => 'right') {
           xml.a I18n.t("contact"),
-          :href => 'mailto:#{$contact}',
+          :href => "mailto:#{$contact}",
           :class => 'off'
         }
       }
