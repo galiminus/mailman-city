@@ -73,16 +73,15 @@ class List
     `cd '#{$mailman_dir}' && bin/list_members '#{@name}@#{@host}'`.split("\n").each do |line|
       members << line
     end
-    puts members
     return members
   end
 
   def subscribe(email)
-    puts `cd '#{$mailman_dir}' && echo '#{email}' | bin/add_members -w n -r - '#{@name}@#{host}'`
+    `cd '#{$mailman_dir}' && echo '#{email}' | bin/add_members -w n -r - '#{@name}@#{host}'`
   end
 
   def unsubscribe(email)
-    puts `cd '#{$mailman_dir}' && echo '#{email}' | bin/remove_members -n -f - '#{@name}@#{host}'`
+    `cd '#{$mailman_dir}' && echo '#{email}' | bin/remove_members -n -f - '#{@name}@#{host}'`
   end
 end
 
