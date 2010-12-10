@@ -6,7 +6,7 @@ require 'nokogiri'
 require 'crypt/rijndael'
 require 'yaml'
 require 'uri'
-require 'zlib'
+require 'escape'
 
 config = YAML.load_file("config.yaml")
 config.each do |key, value|
@@ -35,7 +35,8 @@ class Place
 
   def lists
     lists = []
-    `cd '#{$mailman_dir}' && bin/list_lists -V '#{@name}'`.split("\n").each do |line|
+    name = Escape.shell_command(@name)
+    `cd '#{$mailman_dir}' && bin/list_lists -V #{name}`.split("\n").each do |line|
       match = line.match(/([a-z]+)\@/)
       lists << List.new(match[1], "#{name}.#{$domain}") if match
     end
@@ -70,18 +71,21 @@ class List
 
   def members
     members = []
-    `cd '#{$mailman_dir}' && bin/list_members '#{@name}@#{@host}'`.split("\n").each do |line|
+    list = Escape.shell_command("#{@name}@#{@host}")
+    `cd '#{$mailman_dir}' && bin/list_members #{list}`.split("\n").each do |line|
       members << line
     end
     return members
   end
 
   def subscribe(email)
-    `cd '#{$mailman_dir}' && echo '#{email}' | bin/add_members -w n -r - '#{@name}@#{host}'`
+    list = Escape.shell_command("#{@name}@#{host}")
+    `cd '#{$mailman_dir}' && echo #{Escape.shell_command(email)} | bin/add_members -w n -r - #{list}`
   end
 
   def unsubscribe(email)
-    `cd '#{$mailman_dir}' && echo '#{email}' | bin/remove_members -n -f - '#{@name}@#{host}'`
+    list = Escape.shell_command("#{@name}@#{host}")
+    `cd '#{$mailman_dir}' && echo #{Escape.shell_command(email)} | bin/remove_members -n -f - #{list}`
   end
 end
 
