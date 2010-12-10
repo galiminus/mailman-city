@@ -133,7 +133,7 @@ def send_confirm(place, lists, email, subscribe)
 
   Pony.mail(:to => email,
             :from => "#{$from}@#{$domain}",
-            :subject => @subscribe ? I18n.t("confirm_unsub") : I18n.t("confirm_unsub"),
+            :subject => @subscribe ? I18n.t("confirm_sub") : I18n.t("confirm_unsub"),
             :body => body)
 end
 
