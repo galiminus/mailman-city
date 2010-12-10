@@ -11,3 +11,5 @@ fr:
   unsub: 'Désinscription'
   post: "Poster"
   archives: "Archives"
+  confirmed_sub: "Inscription confirmée"
+  confirmed_unsub: "Désinscription confirmée"
