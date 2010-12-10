@@ -7,6 +7,7 @@ require 'crypt/rijndael'
 require 'yaml'
 require 'uri'
 require 'escape'
+require 'pathname'
 
 config = YAML.load_file("config.yaml")
 config.each do |key, value|
@@ -90,18 +91,21 @@ class List
 end
 
 def load_xhtml(path)
-  raw = File.open(path).read
-  raw.gsub!('<UL>', '<li><ul class="sublist">')
-  raw.gsub!('</UL>', '</ul></li>')
-  raw.gsub!('</I>', '</i>')
-  raw.gsub!('<LI>', '<li>')
-  raw.gsub!('<A HREF', '<a href')
-  raw.gsub!('</A>', '</a>')
-  raw.gsub!('<PRE>', '<pre class="text">')
-  raw.gsub!('</PRE>', '</pre>')
-  raw.gsub!("Previous message:", "")
-  raw.gsub!("Next message:", "")
-  return raw
+  path = Pathname.new(path).cleanpath.to_s
+  if (path =~ /^views\/archives\//)
+    raw = File.open(path).read
+    raw.gsub!('<UL>', '<li><ul class="sublist">')
+    raw.gsub!('</UL>', '</ul></li>')
+    raw.gsub!('</I>', '</i>')
+    raw.gsub!('<LI>', '<li>')
+    raw.gsub!('<A HREF', '<a href')
+    raw.gsub!('</A>', '</a>')
+    raw.gsub!('<PRE>', '<pre class="text">')
+    raw.gsub!('</PRE>', '</pre>')
+    raw.gsub!("Previous message:", "")
+    raw.gsub!("Next message:", "")
+    return raw
+  end
 end
 
 def send_confirm(place, lists, email, subscribe)
