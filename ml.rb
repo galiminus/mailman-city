@@ -127,7 +127,7 @@ def send_confirm(place, lists, email, subscribe)
   body += "\n-- \n#{$domain}"
 
   Pony.mail(:to => email,
-            :from => '#{$from}@#{$domain}',
+            :from => "#{$from}@#{$domain}",
             :subject => @subscribe ? 'Confirmation inscription' : 'Confirmation desinscription',
             :body => body)
 end
@@ -149,10 +149,12 @@ get '/confirm/:infos' do
     @lists << List.new(name, "#{@place.name}.#{$domain}")
   end
 
-  if @subscribe
-    
-  else
-
+  @lists.each do |list|
+    if @subscribe
+      list.subscribe(infos['email'])
+    else
+      list.unsubscribe(infos['email'])
+    end
   end
 
   @page = 'place'
