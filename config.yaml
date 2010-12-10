@@ -1,0 +1,6 @@
+domain: 'test.org'
+from: 'admin'
+contact: 'listmaster@test.org'
+title: 'Test.org'
+mailman_dir: '/usr/local/mailman/'
+aes_key: 'blahblah'
