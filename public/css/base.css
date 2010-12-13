@@ -259,6 +259,9 @@ body {
 
 .threads ul li {
     padding: 0px;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #DEDEDE;
 }
 
 .threads ul li a {
@@ -267,6 +270,8 @@ body {
 
 .threads ul.sublist li {
     padding-left: 24px;
+    background-color: #FFFFFF;
+    border-bottom-style: none;
 }
 
 .email {
