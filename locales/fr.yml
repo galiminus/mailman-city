@@ -1,10 +1,9 @@
 fr:
   confirm: 'Veuillez cliquer sur le lien suivant pour confirmer'
-  lists: 'Liste(s) concernée(s)'
   confirm_sub: 'Confirmation inscription'
   confirm_unsub: 'Confirmation désinscription'
   contact: 'Contact'
-  places: 'Villes'
+  lists: 'Listes'
   confirm_email: 'Un email de confirmation vous a été envoyé à : '
   email_addr: 'Adresse email : '
   sub: 'Inscription'

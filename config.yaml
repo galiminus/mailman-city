@@ -1,7 +1,8 @@
-domain: 'test.org'
-from: 'admin'
-contact: 'listmaster@test.org'
-title: 'Test.org'
+domain: 'mlfurs.org'
+from: 'mlfurs'
+contact: 'listmaster@mlfurs.org'
+title: 'MLFurs.org'
 mailman_dir: '/usr/local/mailman/'
-aes_key: 'blahblah'
+aes_key: '108b24a4b269d19eee75999c7cd6a4598f9c90dd'
 locale: 'fr'
+lists: ["paris", "marseille", "belgique"]

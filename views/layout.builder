@@ -18,24 +18,25 @@ xml.html(:xmlns => "http://www.w3.org/1999/xhtml") {
                 :href => '/',
                 :class => (@page == 'home' ? 'on' : 'off'))
         }
+        xml.li("/", :class => 'left sep')
 
-        xml.li(:class => 'left') {
-          xml.a(@place.name.capitalize,
-                :href => "/#{@place.name}",
-                :class => (@page == 'place' ? 'on' : 'off'))
-        } if @place
+        if @list
+          xml.li(:class => 'left') {
+            xml.a(@list.name,
+                  :href => "/#{@list.name}/",
+                  :class => (@page == 'list' ? 'on' : 'off'))
+          }
+          xml.li("/", :class => 'left sep')
+        end
 
-        xml.li(:class => 'left') {
-          xml.a(@list.name,
-                :href => "/#{@place.name}/#{@list.name}/",
-                :class => (@page == 'list' ? 'on' : 'off'))
-        } if @list
 
-        xml.li(:class => 'left') {
-          xml.a(@date.sub(/([0-9]+)-(.+)/, '\2 \1'),
-                :href => "/#{@place.name}/#{@list.name}/#{@date}/thread.html",
-                :class => (@page == 'date' ? 'on' : 'off'))
-        } if @date
+        if @date
+          xml.li(:class => 'left') {
+            xml.a(@date.sub(/([0-9]+)-(.+)/, '\2 \1'),
+                  :href => "/#{@list.name}/#{@date}/thread.html",
+                  :class => (@page == 'date' ? 'on' : 'off'))
+          }
+        end
 
         xml.li(:class => 'right') {
           xml.a I18n.t("contact"),

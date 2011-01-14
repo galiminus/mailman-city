@@ -1,15 +1,15 @@
 xml.div(:class => 'block') {
-  xml.h2 @place.name.capitalize
-  xml.form(:action => "/#{@place.name}/subscribe", :method => 'post') {
+  xml.h2 I18n.t("lists")
+  xml.form(:action => "/subscribe", :method => 'post') {
     xml.ul {
-      @place.lists.each do |list|
+      @ml.lists.each do |list|
         xml.li {
           xml.input(:type => 'checkbox',
                     :name => "list_#{list.name}",
                     :id => list.name,
                     :value => list.name)
           xml.label(:for => list.name) {
-            xml.span("#{list.name}@#{list.host}",
+            xml.span("#{list.name}@#{list.domain}",
                      :class => 'email')
           }
           nb = list.members.length
@@ -18,10 +18,10 @@ xml.div(:class => 'block') {
           xml.span(:class => 'buttons') {
             xml.a(I18n.t("post"),
                   :class => 'button',
-                  :href => "mailto:#{list.name}@#{list.host}")
+                  :href => "mailto:#{list.name}@#{list.domain}")
             xml.a(I18n.t("archives"),
                   :class => 'button',
-                  :href => "/#{@place.name}/#{list.name}/") if !List.empty?(@place.name, list.name)
+                  :href => "/#{list.name}/") if !List.empty?(list.name)
           }
         }
       end

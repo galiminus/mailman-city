@@ -3,8 +3,7 @@ xml.div(:class => 'block') {
   xml.h2 title
   xml.ul {
     @lists.each do |list|
-      xml.li("#{list.name}@#{list.host}",
-             :class => 'email')
+      xml.li("#{list.name}@#{list.domain}", :class => 'email')
     end
   }
 }

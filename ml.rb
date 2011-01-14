@@ -10,8 +10,8 @@ require 'escape'
 require 'pathname'
 require 'i18n'
 
-config = YAML.load_file("config.yaml")
-config.each do |key, value|
+$config = YAML.load_file("config.yaml")
+$config.each do |key, value|
   eval("$#{key}='#{value}'")
 end
 
@@ -22,38 +22,19 @@ I18n.load_path += Dir[ File.join(path, 'locales', '*.{rb,yml}') ]
 I18n.default_locale = $locale
 
 class MLServer
-  def places
-    places = []
-    Dir.open("#{$mailman_dir}/lists").each do |file|
-      match = file.match(/(.+)\.#{$domain}/)
-      places << Place.new(match[1]) if match
-    end
-    return places
-  end
-end
-
-class Place
-  attr_reader :name
-
-  def initialize(name)
-    @name = name
-  end
-
   def lists
     lists = []
-    name = Escape.shell_command(@name)
-    `cd '#{$mailman_dir}' && bin/list_lists -V #{name}`.split("\n").each do |line|
-      match = line.match(/([a-z]+)\@/)
-      lists << List.new(match[1], "#{name}.#{$domain}") if match
+    $config['lists'].each do |list|
+      lists << List.new(list, $domain)
     end
-    return lists    
+    return lists
   end
 end
 
 class List
   include Comparable
 
-  attr_reader :name, :host
+  attr_reader :name, :domain
 
   def List.email?(email)
     TMail::Address.parse(email)
@@ -62,13 +43,13 @@ class List
     false
   end
 
-  def List.empty?(place, name)
-    !File.exists?("views/archives/#{place}.#{$domain}/#{name}/pipermail.pck")
+  def List.empty?(name)
+    !File.exists?("views/archives/#{name}/pipermail.pck")
   end
 
-  def initialize(name, host)
+  def initialize(name, domain)
     @name = name
-    @host = host
+    @domain = domain
   end
 
   def <=>(other)
@@ -76,12 +57,12 @@ class List
   end
 
   def ==(other)
-    @host = other.host and @name == other.name
+    @domain = other.domain and @name == other.name
   end
 
   def members
     members = []
-    list = Escape.shell_command("#{@name}@#{@host}")
+    list = Escape.shell_command(@name)
     `cd '#{$mailman_dir}' && bin/list_members #{list}`.split("\n").each do |line|
       members << line
     end
@@ -89,12 +70,12 @@ class List
   end
 
   def subscribe(email)
-    list = Escape.shell_command("#{@name}@#{host}")
+    list = Escape.shell_command(@name)
     `cd '#{$mailman_dir}' && echo #{Escape.shell_command(email)} | bin/add_members -w n -r - #{list}`
   end
 
   def unsubscribe(email)
-    list = Escape.shell_command("#{@name}@#{host}")
+    list = Escape.shell_command(@name)
     `cd '#{$mailman_dir}' && echo #{Escape.shell_command(email)} | bin/remove_members -n -f - #{list}`
   end
 end
@@ -117,30 +98,6 @@ def load_xhtml(path)
   end
 end
 
-def send_confirm(place, lists, email, subscribe)
-  aes_code = $aes.encrypt_string({'place' => place.name,
-                                  'lists' => lists.map {|list| list},
-                                  'email' => email,
-                                  'subscribe' => subscribe}.to_yaml)
-
-  confirm_code = String.new
-  aes_code.each_byte { |byte| confirm_code += ("%02x" % byte) }
-
-  confirm_link = "http://#{$domain}/confirm/#{confirm_code}"
-
-  body = "#{I18n.t "lists"} :\n"
-  lists.each do |list|
-    body += "\t#{list}@#{place.name}.#{$domain}\n"
-  end
-  body += "\n\n#{I18n.t "confirm"} : #{confirm_link}"
-  body += "\n-- \n#{$domain}"
-
-  Pony.mail(:to => email,
-            :from => "#{$from}@#{$domain}",
-            :subject => @subscribe ? I18n.t("confirm_sub") : I18n.t("confirm_unsub"),
-            :body => body)
-end
-
 # Actions
 
 get '/confirm/:infos' do
@@ -148,14 +105,11 @@ get '/confirm/:infos' do
   aes_infos = raw_infos.scan(/../).map { |num| num.to_i(16) }.pack('c*')
   infos = YAML::load($aes.decrypt_string(aes_infos))
 
-
-  @place = Place.new(infos['place'])
   @subscribe = infos['subscribe']
 
-  @lists = Array.new
-
+  @lists = []
   infos['lists'].each do |name|
-    @lists << List.new(name, "#{@place.name}.#{$domain}")
+    @lists << List.new(name, $domain)
   end
 
   @lists.each do |list|
@@ -166,15 +120,13 @@ get '/confirm/:infos' do
     end
   end
 
-  @page = 'place'
+  @page = 'lists'
   builder :confirm
 end
 
-post '/:place/subscribe/?' do
-  name = params[:place]
+post '/subscribe/?' do
   @email = params[:email]
   @subscribe = params[:subscribe] == I18n.t("sub") ? true : false
-  @place = Place.new(params[:place])
 
   lists = []
   params.each_key do |list|
@@ -182,46 +134,56 @@ post '/:place/subscribe/?' do
       lists << params[list]
     end
   end
-  send_confirm(@place, lists, @email, @subscribe)
 
-  @page = 'place'
-  builder :place
+  aes_code = $aes.encrypt_string({'lists' => lists.map {|list| list},
+                                  'email' => @email,
+                                  'subscribe' => @subscribe}.to_yaml)
+
+  confirm_code = String.new
+  aes_code.each_byte { |byte| confirm_code += ("%02x" % byte) }
+
+  confirm_link = "http://#{$domain}/confirm/#{confirm_code}"
+
+  body = "#{I18n.t "lists"} :\n"
+  lists.each do |list|
+    body += "\t#{list}@#{$domain}\n"
+  end
+  body += "\n\n#{I18n.t "confirm"} : #{confirm_link}"
+  body += "\n-- \n#{$domain}"
+
+  Pony.mail(:to => @email,
+            :from => "#{$from}@#{$domain}",
+            :subject => @subscribe ? I18n.t("confirm_sub") : I18n.t("confirm_unsub"),
+            :body => body)
+
+  @ml = MLServer.new
+  @page = 'home'
+  builder :lists
 end
 
 # Views
 
 get '/' do
-  ml = MLServer.new
-  match = request.host.match(/(.+)\.#{$domain}/)
-  if match and $1 != 'www'
-    redirect "http://#{request.host}/#{match[1]}"
-  else
-    @places = ml.places
-    @page = 'home'
-    builder :places
-  end
+  @ml = MLServer.new
+  @page = 'home'
+  builder :lists
 end
 
-get '/:place/?' do
-  @email = ''
-  @place = Place.new(params[:place])
-  @page = 'place'
-  builder :place
+get '/robot.txt' do
+  File.open('robot.txt').read
 end
 
-get '/:place/:ml/?' do
-  @place = Place.new(params[:place])
-  @list = List.new(params[:ml], "#{params[:place]}.#{$domain}")
-  @archive = load_xhtml("views/archives/#{params[:place]}.#{$domain}/#{params[:ml]}/index.html")
+get '/:list/?' do
+  @list = List.new(params[:list], $domain)
+  @archive = load_xhtml("views/archives/#{@list.name}/index.html")
   @page = 'list'
   builder :list
 end
 
-get '/:place/:ml/:date/:file?' do
-  @place = Place.new(params[:place])
-  @list = List.new(params[:ml], "#{params[:place]}.#{$domain}")
+get '/:ml/:date/:file?' do
+  @list = List.new(params[:ml], $domain)
   @date = params[:date]
-  @archive = load_xhtml("views/archives/#{params[:place]}.#{$domain}/#{params[:ml]}/#{params[:date]}/#{params[:file]}")
+  @archive = load_xhtml("views/archives/#{@list.name}/#{params[:date]}/#{params[:file]}")
   @page = 'date'
   builder :list
 end
