@@ -149,6 +149,7 @@ post '/subscribe/?' do
     body += "\t#{list}@#{$domain}\n"
   end
   body += "\n\n#{I18n.t "confirm"} : #{confirm_link}"
+  body += "\n\n#{I18n.t "confirm_comment"}"
   body += "\n-- \n#{$domain}"
 
   Pony.mail(:to => @email,

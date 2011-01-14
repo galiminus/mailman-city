@@ -1,5 +1,6 @@
 fr:
   confirm: 'Veuillez cliquer sur le lien suivant pour confirmer'
+  confirm_comment: "N'hesitez pas a poster sur la liste pour vous presenter :)"
   confirm_sub: 'Confirmation inscription'
   confirm_unsub: 'Confirmation désinscription'
   contact: 'Contact'
